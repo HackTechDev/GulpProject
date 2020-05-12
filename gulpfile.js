@@ -3,8 +3,9 @@ const minify = require("gulp-minify");
 const rename = require('gulp-rename');
 const del = require('del');
 const sftp = require('gulp-sftp');
+const git = require('gulp-git');
 
-const cleanDist = () => del([ 'dist' ]);
+const cleanDist = () => del([ 'htdocs' ]);
 
 
 function renameFile() {
@@ -23,20 +24,30 @@ function minifyScript() {
 
 
 function uploadSFTP() {
+
     return src('htdocs/*')
         .pipe(sftp({
             host: 'sftp.sd3.gpaas.net',
-            remotePath: '/lamp0/web/vhosts/********/htdocs/',
-            user: '**********',
-            pass: '**********'
+            user: '3579438',            
+            remotePath: '/lamp0/web/vhosts/hacktech.dev/htdocs/',
         }));
 }
 
-const build = series(cleanDist, renameFile, minifyScript, uploadSFTP);
+
+function pushGitHub() {
+
+  git.push('origin', 'master', function (err) {
+    if (err) throw err;
+  });
+}
+
+
+const build = series(cleanDist, renameFile, minifyScript, pushGitHub, uploadSFTP);
 
 exports.rename = renameFile;
 exports.script = minifyScript;
 exports.clean = cleanDist;
+exports.git = pushGitHub;
 exports.sftp = uploadSFTP
 exports.build = build;
 
