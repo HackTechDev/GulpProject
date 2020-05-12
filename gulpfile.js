@@ -34,10 +34,11 @@ function uploadSFTP() {
 }
 
 
-function pushGitHub() {
+function pushGitHub(done) {
 
-  git.push('origin', 'master', function (err) {
+  return git.push('origin', 'master', function (err) {
     if (err) throw err;
+    if (done) done();
   });
 }
 
